@@ -4,15 +4,15 @@ import { useReferralStore } from '@/stores/referral.store';
 import { usePointsStore } from '@/stores/points.store';
 import PointsBalanceCard from '@/components/referral/PointsBalanceCard.vue';
 import CopyReferralLink from '@/components/referral/CopyReferralLink.vue';
-// import ReferralHistoryTable from '@/components/referral/ReferralHistoryTable.vue';
 import ReferralForm from '@/components/referral/ReferralForm.vue';
 import GlobalDrawer from '@/components/ui/GlobalDrawer.vue';
+import RewardPoints from '@/components/RewardPoints.vue';
 
 const referralStore = useReferralStore();
 const pointsStore = usePointsStore();
 const showDrawer = ref(false);
 
-const totalValues = reactive([
+const stats = [
   {
     title: 'Total Referral',
     value: 20,
@@ -22,18 +22,26 @@ const totalValues = reactive([
     title: 'Total Success',
     value: 16,
     icon: 'IconCheck',
+    iconClass: 'text-green-600 dark:text-green-400',
+    iconBg: 'bg-green-100 dark:bg-green-900/50'
   },
   {
     title: 'Total Pending',
     value: 4,
     icon: 'IconClock',
+    iconClass: 'text-yellow-600 dark:text-yellow-400',
+    iconBg: 'bg-yellow-100 dark:bg-yellow-900/50'
   },
   {
     title: 'Total Rejected',
     value: 0,
     icon: 'IconX',
+    iconClass: 'text-red-600 dark:text-red-400',
+    iconBg: 'bg-red-100 dark:bg-red-900/50'
   }
-]);
+];
+
+const points = ref(200);
 
 onMounted(() => {
   referralStore.fetchReferrals();
@@ -46,6 +54,11 @@ const handleFormSubmit = async (formData: any) => {
     showDrawer.value = false;
   }
 };
+
+const handleUpgrade = () => {
+  // Handle upgrade logic here
+  console.log('Upgrade button clicked');
+};
 </script>
 
 <template>
@@ -55,32 +68,11 @@ const handleFormSubmit = async (formData: any) => {
       @new-connection="showDrawer = true"
       />
     </div>
-    <div class="col-span-1 grid grid-cols-2 gap-2 md:gap-4">
-      <div class="col-span-2 bg-[url('/images/gradient.svg')] bg-cover p-4 md:p-6 border border-gray-300 rounded-xl flex gap-2 md:gap-4">
-        <h3 class="text-2xl md:text-5xl">🏆</h3>
-          <div class="flex flex-col flex-1">
-            <p class="text-lg md:text-xl text-gray-700 font-medium">Reword Point</p>
-            <div class="flex justify-between">
-              <p class="text-2xl md:text-3xl text-gray-700">200 <span class="text-xl md:text-2xl text-gray-400">৳ 2000</span></p>
-              <button class="rounded p-2 text-white bg-blue-600">Upgrade</button>
-            </div>
-          </div>
-      </div>
-      <div v-for="value in totalValues" :key="value.title" :class="value.icon" class="bg-[url('/images/gradient.svg')] bg-cover p-2 md:p-4 border border-gray-300 rounded-xl flex gap-2 md:gap-4 items-center">
-        <div class="bg-blue-100 dark:bg-blue-500 flex justify-center items-center h-10 w-10 rounded-full ">
-          <component :is="value.icon" class="text-blue-800 dark:text-blue-100" />
-        </div>
-          <div class="flex flex-col flex-1">
-            <p class="text-gray-700 dark:text-gray-100 font-medium">{{ value.title }}</p>
-            <div class="flex justify-between">
-              <p class="text-lg md:text-3xl text-gray-700 dark:text-gray-100">{{ value.value }}</p>
-            </div>
-          </div>
-      </div>
-    </div>
-
-
-
+    <RewardPoints 
+      :points="points" 
+      :stats="stats"
+      @upgrade="handleUpgrade"
+    />
     <div class="flex flex-col space-y-6">
 
       <!-- Points Balance Card -->
@@ -109,7 +101,7 @@ const handleFormSubmit = async (formData: any) => {
     </div> 
 
     <!-- Add Referral Drawer -->
-    <GlobalDrawer v-model="showDrawer" title="New Connection Referred" size="sm" >
+    <GlobalDrawer v-model="showDrawer" title="New Connection Referred" size="md" >
       <ReferralForm 
         :loading="referralStore.loading" 
         :error="referralStore.error"

@@ -32,26 +32,6 @@ defineOptions({
   inheritAttrs: false,
 });
 
-const props = withDefaults(defineProps<{
-  modelValue: boolean;
-  title?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'full';
-  side?: 'right' | 'left' | 'top' | 'bottom';
-  closeOnClickOutside?: boolean;
-  closeOnEscape?: boolean;
-  showCloseButton?: boolean;
-  fullHeight?: boolean;
-  noPadding?: boolean;
-}>(), {
-  title: '',
-  size: 'md',
-  side: 'right',
-  closeOnClickOutside: true,
-  closeOnEscape: true,
-  showCloseButton: true,
-  fullHeight: false,
-  noPadding: false,
-});
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void;

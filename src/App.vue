@@ -73,7 +73,7 @@ const pageTitle = computed(() => {
       @toggle-mobile-menu="toggleMobileMenu" 
     />
     <TopBarMobile class="md:hidden" />
-    <div class="m-0 md:m-6 p-2 md:p-6 flex-1 rounded-2xl container mx-auto bg-card-light dark:bg-card-dark">
+    <div class="m-0 mt-20 md:m-6 p-2 md:p-6 flex-1 rounded-2xl container mx-auto bg-card-light dark:bg-card-dark">
       <RouterView />
     </div>
     <BottomNavigationMobile class="md:hidden" />
