@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { useTheme } from '@/composables/useTheme';
 import { navGroups, HomeIcon, OfferIcon, PackageIcon, PaymentIcon, ShareIcon, ProfileIcon, ReportIcon, BellIcon } from '@/config/navigation';
 
-// Create an icon map to resolve icon names to components
 const iconMap = {
   'HomeIcon': HomeIcon,
   'OfferIcon': OfferIcon,

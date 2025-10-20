@@ -14,7 +14,6 @@ type FormValues = {
   package: string;
 };
 
-// Sample data for dropdowns
 const districts = [
   { value: 'dhaka', label: 'Dhaka' },
   { value: 'chittagong', label: 'Chittagong' },
@@ -34,9 +33,7 @@ const packages = [
   { value: 'premium', label: 'Premium Package' },
 ];
 
-// Update upazilas based on selected district
 const updateUpazilas = (district: string) => {
-  // This is a simplified example - in a real app, you might fetch this from an API
   const upazilaMap: Record<string, {value: string; label: string}[]> = {
     dhaka: [
       { value: 'dhanmondi', label: 'Dhanmondi' },
@@ -47,7 +44,6 @@ const updateUpazilas = (district: string) => {
       { value: 'patenga', label: 'Patenga' },
       { value: 'halishahar', label: 'Halishahar' },
     ],
-    // Add more upazilas for other districts as needed
   };
   
   upazilas.value = upazilaMap[district] || [];
@@ -62,7 +58,6 @@ const emit = defineEmits<{
   (e: 'submit', formData: FormValues): void;
 }>();
 
-// Validation schema
 const schema = yup.object({
   name: yup.string().required('Name is required').trim(),
   phone: yup.string()
@@ -91,11 +86,9 @@ const { handleSubmit, setFieldValue, watch: formWatch } = useForm<FormValues>({
   }
 });
 
-// Watch for district changes to update upazilas
 watch(() => formWatch('district'), (newDistrict) => {
   if (newDistrict) {
     updateUpazilas(newDistrict);
-    // Reset upazila when district changes
     setFieldValue('upazila', '');
   }
 });

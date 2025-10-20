@@ -1,3 +1,5 @@
+import type { Referral, ReferralStatus } from '@/types/referral';
+
 // Mock data
 const MOCK_REFERRALS: Referral[] = [
   {
@@ -92,6 +94,11 @@ export default {
     
     MOCK_REFERRALS.unshift(newReferral);
     return newReferral;
+  },
+
+  // Backwards-compatible createReferral -> uses postManual under the hood
+  async createReferral(data: { name: string; email: string; phone?: string }) {
+    return this.postManual(data);
   },
 
   // Get points balance

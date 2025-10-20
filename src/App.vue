@@ -14,11 +14,9 @@ const toggleMobileMenu = (state?: boolean) => {
   } else {
     isMobileMenuOpen.value = !isMobileMenuOpen.value;
   }
-  // Lock body scroll when mobile menu is open
   document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : '';
 };
 
-// Close menu when clicking outside on mobile
 const handleClickOutside = (event: MouseEvent) => {
   const sidebar = document.querySelector('.sidebar');
   const menuButton = document.querySelector('.menu-button');
@@ -30,20 +28,17 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 };
 
-// Close menu on escape key press
 const handleKeydown = (event: KeyboardEvent) => {
   if (event.key === 'Escape' && isMobileMenuOpen.value) {
     toggleMobileMenu(false);
   }
 };
 
-// Add event listeners for outside click and keyboard
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
   document.addEventListener('keydown', handleKeydown);
 });
 
-// Cleanup event listeners
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
   document.removeEventListener('keydown', handleKeydown);

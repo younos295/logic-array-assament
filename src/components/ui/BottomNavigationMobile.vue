@@ -3,7 +3,6 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
-// Import all icons
 import HomeIcon from '@/assets/icons/home-01.svg'
 import PaymentIcon from '@/assets/icons/payment-02.svg'
 import ShareIcon from '@/assets/icons/share-01.svg'
@@ -12,7 +11,6 @@ import MobileNavBg from '@/assets/images/mobile-nav-bg.svg';
 
 const route = useRoute()
 
-// Navigation items with their respective icons and routes
 const navItems = [
   { 
     name: 'Home', 
@@ -40,7 +38,6 @@ const navItems = [
   }
 ]
 
-// Split navigation items into two groups for layout
 const leftNavItems = computed(() => navItems.slice(0, 2))
 const rightNavItems = computed(() => navItems.slice(2))
 </script>

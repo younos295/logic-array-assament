@@ -6,7 +6,7 @@
 export {}
 
 /* prettier-ignore */
-declare module 'vue' {
+declare module '@vue/runtime-core' {
   export interface GlobalComponents {
     BottomNavigationMobile: typeof import('./src/components/ui/BottomNavigationMobile.vue')['default']
     CopyReferralLink: typeof import('./src/components/referral/CopyReferralLink.vue')['default']

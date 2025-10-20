@@ -2,6 +2,32 @@
 import { ref, watch, onMounted, computed, onUnmounted } from 'vue';
 import { useVModel } from '@vueuse/core';
 
+type Size = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl' | '5xl' | '6xl' | '7xl' | 'full';
+type Side = 'right' | 'left' | 'top' | 'bottom';
+
+interface Props {
+  modelValue: boolean;
+  title?: string;
+  size?: Size;
+  side?: Side;
+  closeOnClickOutside?: boolean;
+  closeOnEscape?: boolean;
+  showCloseButton?: boolean;
+  fullHeight?: boolean;
+  noPadding?: boolean;
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  title: '',
+  size: 'md',
+  side: 'right',
+  closeOnClickOutside: true,
+  closeOnEscape: true,
+  showCloseButton: true,
+  fullHeight: false,
+  noPadding: false,
+});
+
 defineOptions({
   inheritAttrs: false,
 });
@@ -91,7 +117,6 @@ function handleClickOutside(e: MouseEvent) {
   }
 }
 
-// Handle body scroll lock when drawer is open
 watch(isOpen, (newVal) => {
   if (newVal) {
     document.body.style.overflow = 'hidden';
@@ -105,7 +130,6 @@ watch(isOpen, (newVal) => {
   }
 });
 
-// Cleanup event listeners
 onUnmounted(() => {
   document.body.style.overflow = '';
   document.removeEventListener('keydown', handleKeydown);
@@ -147,9 +171,7 @@ onUnmounted(() => {
             aria-modal="true"
             :aria-label="title || 'Drawer'"
           >
-            <!-- Content Wrapper -->
             <div class="relative flex flex-col h-full" :class="{ 'p-6': !noPadding }">
-            <!-- Header -->
             <div v-if="title || $slots.header || showCloseButton" class="flex items-center justify-between mb-6">
               <h2 v-if="title" class="text-xl font-medium text-gray-900 dark:text-white">
                 {{ title }}
