@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+@config "../../tailwind.config.js";
+
+
+
+html {
+  @apply h-full box-border p-0 m-0;
+
+  }
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+@layer base {
+  body {
+    @apply h-screen text-xs sm:text-sm font-geist box-border;
+    min-height: 100vh;      /* full-height pages */
+  margin: 0;
+  padding: 0;
+  }
+}
