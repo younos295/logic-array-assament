@@ -39,7 +39,7 @@ const shareOnFacebook = () => {
 </script>
 
 <template>
-  <div class="col-span-1 bg-[url('/images/gradient.svg')] bg-cover bg-center bg-background-dark dark:bg-blue-600 rounded-lg p-2 md:p-4">
+  <div class="bg-[url('/images/gradient.svg')] bg-cover bg-center bg-background-dark dark:bg-blue-600 rounded-lg p-4">
     <h2 class="text-3xl font-bold text-white mb-4">Refried friend and Get ৳10 off. Get up to ৳600</h2>
     <h3 class="font-medium text-white mb-2">Your referral invite link</h3>
     <div class="flex flex-col sm:flex-row gap-2 my-4">
@@ -58,7 +58,7 @@ const shareOnFacebook = () => {
       </div>
       <button
         @click="copyToClipboard"
-        class="inline-flex gap-2 items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-800 bg-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+        class="inline-flex gap-2 items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-800 dark:text-white bg-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
       >
         <IconCopy class="h-4 w-4" />
         <span>{{ copied ? 'Copied!' : 'Copy Link' }}</span>

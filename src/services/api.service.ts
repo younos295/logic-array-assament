@@ -9,16 +9,23 @@ const MOCK_REFERRALS: Referral[] = [
     phone: '+8801712345678',
     status: 'pending',
     date: new Date(Date.now() - 86400000 * 2).toISOString(),
+    points: 0,
   },
-  // Add more mock referrals (15-25 items total)
-  ...Array.from({ length: 15 }, (_, i) => ({
-    id: (i + 2).toString(),
-    name: `User ${i + 2}`,
-    email: `user${i + 2}@example.com`,
-    phone: `+88017${Math.floor(1000000 + Math.random() * 9000000)}`,
-    status: ['pending', 'success', 'rejected'][Math.floor(Math.random() * 3)] as ReferralStatus,
-    date: new Date(Date.now() - 86400000 * Math.floor(Math.random() * 30)).toISOString(),
-  })),
+  ...Array.from({ length: 15 }, (_, i) => {
+    const status = ['pending', 'success', 'rejected'][Math.floor(Math.random() * 3)] as ReferralStatus;
+    const isSuccess = status === 'success';
+    
+    return {
+      id: (i + 2).toString(),
+      name: `User ${i + 2}`,
+      email: `user${i + 2}@example.com`,
+      phone: `+88017${Math.floor(1000000 + Math.random() * 9000000)}`,
+      status,
+      date: new Date(Date.now() - 86400000 * Math.floor(Math.random() * 30)).toISOString(),
+      discount: isSuccess ? Math.floor(Math.random() * 20) + 5 : 0, // 5-25% discount
+      points: isSuccess ? Math.floor(Math.random() * 100) + 50 : 0, // 50-150 points
+    };
+  }),
 ];
 
 // Mock API service

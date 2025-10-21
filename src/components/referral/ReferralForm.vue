@@ -11,7 +11,7 @@ type FormValues = {
   district: string;
   upazila: string;
   address: string;
-  package: string;
+  packageName: string;
 };
 
 const districts = [
@@ -134,11 +134,11 @@ const schema = yup.object({
   district: yup.string().required('District is required'),
   upazila: yup.string().required('Upazila is required'),
   address: yup.string().required('Address is required'),
-  package: yup.string().required('Package is required'),
+  packageName: yup.string().required('Package is required'),
 });
 
 // Initialize form with useForm
-const { handleSubmit, setFieldValue, values } = useForm<FormValues>({
+const { handleSubmit, setFieldValue, values, resetForm } = useForm<FormValues>({
   validationSchema: schema,
   initialValues: {
     name: '',
@@ -147,8 +147,19 @@ const { handleSubmit, setFieldValue, values } = useForm<FormValues>({
     district: '',
     upazila: '',
     address: '',
-    package: ''
+    packageName: ''
   } as FormValues
+});
+
+// Expose reset method to parent
+const resetFormState = () => {
+  resetForm();
+  upazilas.value = [];
+  currentDistrict.value = '';
+};
+
+defineExpose({
+  resetFormState
 });
 
 // Form submission handler
@@ -160,19 +171,6 @@ const onSubmit = handleSubmit((values: FormValues) => {
 const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }): void => {
   console.log('Form validation errors:', errors);
 };
-
-// Form values with default values
-const formValues = ref({
-  name: '',
-  phone: '',
-  email: '',
-  district: '',
-  upazila: '',
-  address: '',
-  package: ''
-});
-
-console.log('Form initialized with values:', JSON.parse(JSON.stringify(formValues.value)));
 
 // Create a ref to track the current district
 const currentDistrict = ref('');
@@ -403,17 +401,17 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
 
     <!-- Package Field -->
     <div>
-      <label for="package" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <label for="packageName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Package Name <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field
           v-slot="{ field, errorMessage }"
-          name="package"
+          name="packageName"
         >
           <select
             v-bind="field"
-            id="package"
+            id="packageName"
             :disabled="loading"
             class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-3 py-2 sm:text-sm disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500"
             :class="{ 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500': errorMessage }"
@@ -425,7 +423,7 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
           </select>
         </Field>
       </div>
-      <ErrorMessage name="package" v-slot="{ message }" class="mb-1 text-sm text-red-700 dark:text-red-400">
+      <ErrorMessage name="packageName" v-slot="{ message }" class="mb-1 text-sm text-red-700 dark:text-red-400">
         {{ message }}
       </ErrorMessage>
     </div>

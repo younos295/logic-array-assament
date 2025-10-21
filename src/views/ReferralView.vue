@@ -14,6 +14,19 @@ const userId = 'user123'; // Replace with actual user ID from your auth system
 const referralStore = useReferralStore();
 const pointsStore = usePointsStore();
 const showDrawer = ref(false);
+// Define the type for the form component's instance
+type ReferralFormInstance = {
+  resetFormState: () => void;
+}
+
+const referralFormRef = ref<ReferralFormInstance>();
+
+// Handle drawer state changes
+const handleDrawerUpdate = (isOpen: boolean) => {
+  if (!isOpen && referralFormRef.value) {
+    referralFormRef.value.resetFormState();
+  }
+};
 
 const stats = [
   {
@@ -61,21 +74,21 @@ const handleUpgrade = () => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-    <div class="">
+  <div class="grid grid-cols-1 md:grid-cols-2 md:gap-6">
+    <div class="col-span-1">
       <CopyReferralLink
         :referral-code="userId"
         @new-connection="showDrawer = true"
       />
     </div>
+    <div class="col-span-1">
     <RewardPoints 
       :points="points" 
       :stats="stats"
       @upgrade="handleUpgrade"
     />
-    <div class="flex flex-col space-y-6 col-span-2">
-
-      <!-- Referral History -->
+    </div>
+    <div class="flex flex-col space-y-6 md:col-span-2">
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <ReferralHistoryTable 
           :referrals="referralStore.paginatedReferrals"
@@ -93,8 +106,9 @@ const handleUpgrade = () => {
     </div> 
 
     <!-- Add Referral Drawer -->
-    <GlobalDrawer v-model="showDrawer" title="New Connection Referred" size="md" >
+    <GlobalDrawer v-model="showDrawer" title="New Connection Referred" size="md" @update:modelValue="handleDrawerUpdate">
       <ReferralForm 
+        ref="referralFormRef"
         :loading="referralStore.loading" 
         :error="referralStore.error"
         @submit="handleFormSubmit" 

@@ -7,6 +7,8 @@ export interface Referral {
   phone: string;
   status: ReferralStatus;
   date: string;
+  discount?: number;
+  points?: number;
 }
 
 export interface ReferralFormData {

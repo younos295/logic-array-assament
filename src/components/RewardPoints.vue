@@ -1,6 +1,5 @@
 <template>
-  <div class="col-span-1 grid grid-cols-2 gap-2 md:gap-4">
-    <!-- Main Reward Points Card -->
+  <div class="grid grid-cols-2 gap-2 md:gap-4">
     <div class="col-span-2 bg-[url('/images/gradient.svg')] bg-cover p-4 md:p-6 border border-gray-300 dark:border-gray-600 rounded-xl flex gap-2 md:gap-4">
       <h3 class="text-2xl md:text-5xl">🏆</h3>
       <div class="flex flex-col flex-1">
@@ -19,7 +18,6 @@
       </div>
     </div>
 
-    <!-- Stats Cards -->
     <div 
       v-for="stat in stats" 
       :key="stat.title"
