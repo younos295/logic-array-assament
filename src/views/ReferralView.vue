@@ -19,7 +19,7 @@ type ReferralFormInstance = {
   resetFormState: () => void;
 }
 
-const referralFormRef = ref<ReferralFormInstance>();
+const referralFormRef = ref();
 
 // Handle drawer state changes
 const handleDrawerUpdate = (isOpen: boolean) => {
