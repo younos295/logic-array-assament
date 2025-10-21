@@ -26,13 +26,11 @@
       class="bg-[url('/images/gradient.svg')] bg-cover p-2 md:p-4 border border-gray-300 dark:border-gray-600 rounded-xl flex gap-2 md:gap-4 items-center"
     >
       <div 
-        class="flex justify-center items-center h-10 w-10 rounded-full"
-        :class="stat.iconBg || 'bg-blue-100 dark:bg-blue-500'"
+        class="flex justify-center items-center h-10 w-10 rounded-full bg-blue-200 dark:bg-blue-500"
       >
         <component 
           :is="stat.icon" 
           class="text-blue-800 dark:text-blue-100" 
-          :class="stat.iconClass || ''"
         />
       </div>
       <div class="flex flex-col flex-1">
@@ -56,8 +54,6 @@ defineProps({
       title: string;
       value: string | number;
       icon: any;
-      iconBg?: string;
-      iconClass?: string;
     }>,
     required: true
   }

@@ -6,7 +6,7 @@ export const usePointsStore = defineStore('points', () => {
   const currentPoints = ref(0);
   const lifetimePoints = ref(0);
   const loading = ref(false);
-  const error = ref<string | null>(null);
+  const error = ref(null as string | null);
 
   async function fetchPoints() {
     try {

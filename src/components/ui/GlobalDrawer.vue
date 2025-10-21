@@ -40,7 +40,7 @@ const emit = defineEmits<{
 }>();
 
 const isOpen = useVModel(props, 'modelValue', emit);
-const drawerRef = ref<HTMLElement | null>(null);
+const drawerRef = ref(null as HTMLElement | null);
 
 const sizeClasses = {
   sm: 'max-w-sm',
@@ -64,20 +64,20 @@ const sideClasses = {
 };
 
 const contentClasses = computed(() => {
-  const classes = [];
+  const classes = ref([] as string[]);
   
   if (props.side === 'right' || props.side === 'left') {
-    classes.push('h-full', 'w-full', sizeClasses[props.size]);
-    if (props.fullHeight) classes.push('h-screen');
+    classes.value.push('h-full', 'w-full', sizeClasses[props.size]);
+    if (props.fullHeight) classes.value.push('h-screen');
   } else {
-    classes.push('w-full', 'h-auto', 'max-h-[90vh]');
-    if (props.fullHeight) classes.push('h-screen');
+    classes.value.push('w-full', 'h-auto', 'max-h-[90vh]');
+    if (props.fullHeight) classes.value.push('h-screen');
   }
   
-  if (props.side === 'right') classes.push('ml-auto');
-  if (props.side === 'bottom') classes.push('mt-auto');
+  if (props.side === 'right') classes.value.push('ml-auto');
+  if (props.side === 'bottom') classes.value.push('mt-auto');
   
-  return classes.join(' ');
+  return classes.value.join(' ');
 });
 
 function close() {
@@ -113,7 +113,8 @@ watch(isOpen, (newVal) => {
 onUnmounted(() => {
   document.body.style.overflow = '';
   document.removeEventListener('keydown', handleKeydown);
-  document.removeEventListener('mousedown', handleClickOutside);n});
+  document.removeEventListener('mousedown', handleClickOutside);
+});
 </script>
 
 <template>

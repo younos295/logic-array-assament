@@ -1,4 +1,4 @@
-export type ReferralStatus = 'pending' | 'approved' | 'rejected';
+export type ReferralStatus = 'pending' | 'success' | 'rejected' 
 
 export interface Referral {
   id: string;

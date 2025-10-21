@@ -1,7 +1,7 @@
 import { ref, watchEffect, onMounted } from 'vue'
 
-type Theme = 'light' | 'dark' | 'system'
-const theme = ref<Theme>('light')
+type Theme = 'light' | 'dark' | 'system';
+const theme = ref('light' as Theme)
 
 // Check for saved theme preference or use system preference
 const getSystemTheme = (): Theme => {

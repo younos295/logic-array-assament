@@ -4,14 +4,14 @@ import type { Referral, ReferralStatus, ReferralFormData } from '@/types/referra
 import api from '@/services/api.service';
 
 export const useReferralStore = defineStore('referral', () => {
-  const referrals = ref<Referral[]>([]);
+  const referrals = ref([] as Referral[]);
   const loading = ref(false);
-  const error = ref<string | null>(null);
+  const error = ref(null as string | null);
   const totalItems = ref(0);
   const currentPage = ref(1);
   const itemsPerPage = ref(10);
   const searchQuery = ref('');
-  const statusFilter = ref<ReferralStatus | 'all'>('all');
+  const statusFilter = ref('all' as ReferralStatus | 'all');
 
   const filteredReferrals = computed(() => {
     return (referrals.value || []).filter((referral: Referral) => {

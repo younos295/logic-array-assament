@@ -16,7 +16,7 @@ const MOCK_REFERRALS: Referral[] = [
     name: `User ${i + 2}`,
     email: `user${i + 2}@example.com`,
     phone: `+88017${Math.floor(1000000 + Math.random() * 9000000)}`,
-    status: ['pending', 'approved', 'rejected'][Math.floor(Math.random() * 3)] as ReferralStatus,
+    status: ['pending', 'success', 'rejected'][Math.floor(Math.random() * 3)] as ReferralStatus,
     date: new Date(Date.now() - 86400000 * Math.floor(Math.random() * 30)).toISOString(),
   })),
 ];

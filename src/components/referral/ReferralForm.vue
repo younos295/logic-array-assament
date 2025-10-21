@@ -2,7 +2,7 @@
 import { ExclamationCircleIcon } from '@heroicons/vue/24/outline';
 import { Form, Field, ErrorMessage, useForm } from 'vee-validate';
 import * as yup from 'yup';
-import { ref, watch } from 'vue';
+import { ref, watch, computed } from 'vue';
 
 type FormValues = {
   name: string;
@@ -25,28 +25,96 @@ const districts = [
   { value: 'mymensingh', label: 'Mymensingh' },
 ];
 
-const upazilas = ref<{value: string; label: string}[]>([]);
+type SelectOption = {
+  value: string;
+  label: string;
+}
 
-const packages = [
+const upazilas = ref([] as SelectOption[]);
+
+const packages: SelectOption[] = [
   { value: 'basic', label: 'Basic Package' },
   { value: 'standard', label: 'Standard Package' },
   { value: 'premium', label: 'Premium Package' },
 ];
 
-const updateUpazilas = (district: string) => {
-  const upazilaMap: Record<string, {value: string; label: string}[]> = {
+const updateUpazilas = (district: string): void => {
+  console.group('updateUpazilas');
+  console.log('Called with district:', district);
+  console.log('Current upazilas before update:', upazilas.value);
+  
+  if (!district) {
+    console.log('No district provided, clearing upazilas');
+    upazilas.value = [];
+    console.groupEnd();
+    return;
+  }
+
+  // Convert to lowercase for case-insensitive matching
+  const districtLower = district.toLowerCase().trim();
+  
+  const upazilaMap: Record<string, Array<SelectOption>> = {
     dhaka: [
       { value: 'dhanmondi', label: 'Dhanmondi' },
       { value: 'gulshan', label: 'Gulshan' },
       { value: 'mirpur', label: 'Mirpur' },
+      { value: 'uttara', label: 'Uttara' },
+      { value: 'banani', label: 'Banani' },
+      { value: 'mohammadpur', label: 'Mohammadpur' },
     ],
     chittagong: [
       { value: 'patenga', label: 'Patenga' },
       { value: 'halishahar', label: 'Halishahar' },
+      { value: 'agrabad', label: 'Agrabad' },
+      { value: 'nasirabad', label: 'Nasirabad' },
     ],
+    sylhet: [
+      { value: 'sylhet_sadar', label: 'Sylhet Sadar' },
+      { value: 'zindabazar', label: 'Zindabazar' },
+      { value: 'upashahar', label: 'Upashahar' },
+    ],
+    rajshahi: [
+      { value: 'rajshahi_sadar', label: 'Rajshahi Sadar' },
+      { value: 'shah_mokdum', label: 'Shah Mokdum' },
+    ],
+    khulna: [
+      { value: 'khulna_sadar', label: 'Khulna Sadar' },
+      { value: 'sonadanga', label: 'Sonadanga' },
+    ],
+    barisal: [
+      { value: 'barisal_sadar', label: 'Barisal Sadar' },
+      { value: 'bakerganj', label: 'Bakerganj' },
+    ],
+    rangpur: [
+      { value: 'rangpur_sadar', label: 'Rangpur Sadar' },
+      { value: 'gangachara', label: 'Gangachara' },
+    ],
+    mymensingh: [
+      { value: 'mymensingh_sadar', label: 'Mymensingh Sadar' },
+      { value: 'trishal', label: 'Trishal' },
+    ]
   };
   
-  upazilas.value = upazilaMap[district] || [];
+  // Find the matching district key (case-insensitive)
+  console.log('Available district keys:', Object.keys(upazilaMap));
+  console.log('Looking for district (case-insensitive):', districtLower);
+  
+  const matchedDistrict = Object.keys(upazilaMap).find(key => key.toLowerCase() === districtLower);
+  console.log('Matched district:', matchedDistrict);
+  
+  const matchedUpazilas = matchedDistrict ? upazilaMap[matchedDistrict] : [];
+  console.log('Matched upazilas:', matchedUpazilas);
+  upazilas.value = matchedUpazilas;
+  
+  if (!matchedDistrict) {
+    console.warn(`No upazilas found for district: ${district}`);
+    console.warn('Available districts are:', Object.keys(upazilaMap));
+  } else {
+    console.log(`Successfully updated upazilas for district: ${matchedDistrict}`);
+  }
+  
+  console.log('Updated upazilas:', upazilas.value);
+  console.groupEnd();
 };
 
 defineProps<{
@@ -58,22 +126,19 @@ const emit = defineEmits<{
   (e: 'submit', formData: FormValues): void;
 }>();
 
+// Define form validation schema
 const schema = yup.object({
-  name: yup.string().required('Name is required').trim(),
-  phone: yup.string()
-    .required('Phone number is required')
-    .matches(
-      /^(?:\+88|88)?(01[3-9]\d{8})$/,
-      'Please enter a valid Bangladeshi phone number (e.g., 01XXXXXXXXX or +8801XXXXXXXXX)'
-    ),
-  email: yup.string().required('Email is required').email('Please enter a valid email'),
+  name: yup.string().required('Name is required'),
+  phone: yup.string().required('Phone number is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
   district: yup.string().required('District is required'),
   upazila: yup.string().required('Upazila is required'),
-  address: yup.string().required('Address is required').min(10, 'Address should be at least 10 characters'),
-  package: yup.string().required('Package is required')
+  address: yup.string().required('Address is required'),
+  package: yup.string().required('Package is required'),
 });
 
-const { handleSubmit, setFieldValue, watch: formWatch } = useForm<FormValues>({
+// Initialize form with useForm
+const { handleSubmit, setFieldValue, values } = useForm<FormValues>({
   validationSchema: schema,
   initialValues: {
     name: '',
@@ -83,29 +148,64 @@ const { handleSubmit, setFieldValue, watch: formWatch } = useForm<FormValues>({
     upazila: '',
     address: '',
     package: ''
-  }
+  } as FormValues
 });
 
-watch(() => formWatch('district'), (newDistrict) => {
-  if (newDistrict) {
-    updateUpazilas(newDistrict);
-    setFieldValue('upazila', '');
-  }
-});
-
+// Form submission handler
 const onSubmit = handleSubmit((values: FormValues) => {
-  emit('submit', {
-    ...values,
-    name: values.name.trim(),
-    email: values.email.trim(),
-    phone: values.phone.trim(),
-    address: values.address.trim()
-  });
+  emit('submit', values);
 });
 
-const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
-  console.log('Validation errors:', errors);
+// Handle invalid form submission
+const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }): void => {
+  console.log('Form validation errors:', errors);
 };
+
+// Form values with default values
+const formValues = ref({
+  name: '',
+  phone: '',
+  email: '',
+  district: '',
+  upazila: '',
+  address: '',
+  package: ''
+});
+
+console.log('Form initialized with values:', JSON.parse(JSON.stringify(formValues.value)));
+
+// Create a ref to track the current district
+const currentDistrict = ref('');
+console.log('Initial currentDistrict ref value:', currentDistrict.value);
+
+const hasDistrict = computed(() => !!currentDistrict.value);
+
+// Watch for district changes and update upazilas accordingly
+console.log('Setting up district watcher');
+watch(() => values.district, (newVal, oldVal) => {
+  console.group('District Change');
+  console.log('Previous district value:', oldVal);
+  console.log('New district value:', newVal);
+  console.log('Current form values:', JSON.parse(JSON.stringify(values)));
+
+  currentDistrict.value = newVal || '';
+
+  if (!newVal) {
+    console.log('District cleared, resetting upazilas');
+    upazilas.value = [];
+    setFieldValue('upazila', '');
+    console.log('Upazilas after clear:', upazilas.value);
+  } else {
+    const normalized = newVal.toLowerCase().trim();
+    console.log('Calling updateUpazilas with:', normalized);
+    updateUpazilas(normalized);
+    setFieldValue('upazila', '');
+    console.log('Form values after upazila reset:', JSON.parse(JSON.stringify(values)));
+  }
+  console.groupEnd();
+});
+
+console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)));
 </script>
 
 <template>
@@ -126,7 +226,7 @@ const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
     <!-- Name Field -->
     <div>
       <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Full Name <span class="text-red-500">*</span>
+        Full Name <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field
@@ -152,7 +252,7 @@ const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
     <!-- Phone Field -->
     <div>
       <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Phone Number <span class="text-red-500">*</span>
+        Phone Number <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field
@@ -185,7 +285,7 @@ const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
     <!-- Email Field -->
     <div>
       <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Email <span class="text-red-500">*</span>
+        Email <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field
@@ -219,7 +319,7 @@ const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
     <!-- District Field -->
     <div>
       <label for="district" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        District Name <span class="text-red-500">*</span>
+        District Name <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field
@@ -248,17 +348,18 @@ const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
     <!-- Upazila Field -->
     <div>
       <label for="upazila" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Upazila Name <span class="text-red-500">*</span>
+        Upazila Name <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field
-          v-slot="{ field, errorMessage }"
+          v-slot="{ field, errorMessage, value }"
           name="upazila"
+          v-model="values.upazila"
         >
           <select
             v-bind="field"
             id="upazila"
-            :disabled="loading || !watch('district')"
+            :disabled="loading || !hasDistrict"
             class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-blue-500 focus:ring-blue-500 bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 px-3 py-2 sm:text-sm disabled:opacity-50 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500"
             :class="{ 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500': errorMessage }"
           >
@@ -277,7 +378,7 @@ const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
     <!-- Address Field -->
     <div>
       <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Address <span class="text-red-500">*</span>
+        Address <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field
@@ -303,7 +404,7 @@ const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }) => {
     <!-- Package Field -->
     <div>
       <label for="package" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-        Package Name <span class="text-red-500">*</span>
+        Package Name <span class="text-gray-500">*</span>
       </label>
       <div class="mb-1">
         <Field

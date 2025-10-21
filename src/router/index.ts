@@ -21,6 +21,24 @@ const routes = [
       requiresAuth: true
     }
   },
+  {
+    path: '/payment',
+    name: 'payment',
+    component: () => import('@/views/PaymentView.vue'),
+    meta: {
+      title: 'Payment',
+      requiresAuth: true
+    }
+  },
+  {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/ProfileView.vue'),
+    meta: {
+      title: 'My Profile',
+      requiresAuth: true
+    }
+  },
 ];
 
 const router = createRouter({
