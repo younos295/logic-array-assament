@@ -44,18 +44,15 @@ const rightNavItems = computed(() => navItems.slice(2))
 
 <template>
   <nav 
-    class="fixed bottom-0 left-0 right-0 h-20 flex items-center justify-between p-6 overflow-hidden"
+    class="fixed bottom-0 left-0 right-0 h-20 flex items-center justify-between p-6"
   >
-    <!-- Background -->
     <component 
       :is="MobileNavBg" 
       class="absolute inset-0 z-0 pointer-events-none text-card-light dark:text-card-dark w-full h-full" 
       aria-hidden="true"
     />
 
-    <!-- Foreground nav items -->
     <div class="relative z-10 flex items-center justify-between w-full">
-      <!-- Left -->
       <div class="flex space-x-8">
         <router-link
           v-for="item in leftNavItems"
@@ -82,7 +79,6 @@ const rightNavItems = computed(() => navItems.slice(2))
         </router-link>
       </div>
 
-      <!-- Right -->
       <div class="flex space-x-8">
         <router-link
           v-for="item in rightNavItems"
@@ -111,18 +107,3 @@ const rightNavItems = computed(() => navItems.slice(2))
     </div>
   </nav>
 </template>
-
-
-<!-- <style scoped>
-.router-link-active {
-  @apply opacity-100;
-}
-
-.router-link-active span {
-  @apply text-brand-light font-medium;
-}
-
-.router-link-active :deep(svg) {
-  @apply text-brand-light;
-}
-</style> -->

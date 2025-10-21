@@ -40,7 +40,7 @@ const shareOnFacebook = () => {
 
 <template>
   <div class="bg-[url('/images/gradient.svg')] bg-cover bg-center bg-background-dark dark:bg-blue-600 rounded-lg p-4">
-    <h2 class="text-3xl font-bold text-white mb-4">Refried friend and Get ৳10 off. Get up to ৳600</h2>
+    <h2 class="text-3xl font-bold text-white mb-3">Refried friend and Get ৳10 off. Get up to ৳600</h2>
     <h3 class="font-medium text-white mb-2">Your referral invite link</h3>
     <div class="flex flex-col sm:flex-row gap-2 my-4">
       <div class="relative flex-1">
@@ -108,10 +108,10 @@ const shareOnFacebook = () => {
         </div>
       </div>
       <div class="flex flex-col items-end">
-        <p class="text-white text-sm mb-2 text-right">Share with</p>
+        <p class="text-white text-sm mb-1.5 text-right">Share with</p>
         <img src="/images/QR.png" >
       </div>
     </div>
-    <button class="bg-blue-600 dark:bg-white text-white text-base dark:text-gray-800 rounded-md p-2.5 w-full" @click="$emit('new-connection')">Request for New Connection</button>
+    <button class="bg-blue-600 dark:bg-white text-white text-base dark:text-gray-800 rounded-md p-2 w-full" @click="$emit('new-connection')">Request for New Connection</button>
   </div>
 </template>

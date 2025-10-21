@@ -74,7 +74,7 @@ const handleUpgrade = () => {
 </script>
 
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 md:gap-6">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
     <div class="col-span-1">
       <CopyReferralLink
         :referral-code="userId"
@@ -89,7 +89,7 @@ const handleUpgrade = () => {
     />
     </div>
     <div class="flex flex-col space-y-6 md:col-span-2">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div class="overflow-hidden">
         <ReferralHistoryTable 
           :referrals="referralStore.paginatedReferrals"
           :loading="referralStore.loading"

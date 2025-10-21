@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-2 gap-2 md:gap-4">
+  <div class="grid grid-cols-2 gap-2 md:gap-5">
     <div class="col-span-2 bg-[url('/images/gradient.svg')] bg-cover p-4 md:p-6 border border-gray-300 dark:border-gray-600 rounded-xl flex gap-2 md:gap-4">
       <h3 class="text-2xl md:text-5xl">🏆</h3>
       <div class="flex flex-col flex-1">
@@ -33,7 +33,7 @@
       </div>
       <div class="flex flex-col flex-1">
         <p class="text-gray-700 dark:text-gray-200 text-sm md:text-base font-medium">{{ stat.title }}</p>
-        <p class="text-lg md:text-2xl text-gray-700 dark:text-gray-100">{{ stat.value }}</p>
+        <p class="text-xl md:text-2xl font-medium text-gray-700 dark:text-gray-100">{{ stat.value }}</p>
       </div>
     </div>
   </div>

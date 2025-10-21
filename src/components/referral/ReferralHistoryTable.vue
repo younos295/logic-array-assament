@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, onUnmounted } from 'vue';
+import { ref, onUnmounted, watch } from 'vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
+import { onClickOutside } from '@vueuse/core';
 
 type ReferralStatus = 'pending' | 'success' | 'rejected';
 
@@ -36,7 +37,60 @@ const emit = defineEmits<{
 }>();
 
 const searchQuery = ref('');
-const searchTimeout = ref(null as ReturnType<typeof setTimeout> | null);
+let searchTimeout: number | null = null;
+const showStatusDropdown = ref(false);
+const statusDropdownRef = ref<HTMLElement | null>(null);
+const showMobileSearch = ref(false);
+const showMobileFilter = ref(false);
+const mobileSearchQuery = ref('');
+
+// Track the scroll position when opening modals
+let scrollPosition = 0;
+
+// Handle mobile filter overlay
+watch(showMobileFilter, (isOpen) => {
+  if (isOpen) {
+    // Save current scroll position
+    scrollPosition = window.scrollY;
+    // Add styles to prevent body scroll
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollPosition}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+  } else {
+    // Restore body styles and scroll position
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    window.scrollTo(0, scrollPosition);
+  }
+});
+
+// Handle mobile search overlay
+watch(showMobileSearch, (isOpen) => {
+  if (isOpen) {
+    // Save current scroll position
+    scrollPosition = window.scrollY;
+    // Add styles to prevent body scroll
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${scrollPosition}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+  } else {
+    // Restore body styles and scroll position
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    window.scrollTo(0, scrollPosition);
+  }
+});
+
+// Close dropdown when clicking outside
+onClickOutside(statusDropdownRef, () => {
+  showStatusDropdown.value = false;
+});
 
 const statuses = [
   { id: 'all' as const, name: 'All Statuses' },
@@ -45,16 +99,37 @@ const statuses = [
   { id: 'rejected' as const, name: 'Rejected' }
 ];
 
-const handleSearch = (value: string): void => {
-  searchQuery.value = value;
-
-  if (searchTimeout.value) {
-    clearTimeout(searchTimeout.value);
+const handleSearchInput = (event: Event): void => {
+  const target = event.target as HTMLInputElement;
+  searchQuery.value = target.value;
+  
+  if (searchTimeout !== null) {
+    window.clearTimeout(searchTimeout);
   }
 
-  searchTimeout.value = setTimeout(() => {
+  searchTimeout = window.setTimeout(() => {
     emit('search', searchQuery.value);
   }, 300);
+};
+
+const handleSearch = (query: string): void => {
+  searchQuery.value = query;
+  mobileSearchQuery.value = query;
+  emit('search', query);
+};
+
+const handleMobileSearch = (): void => {
+  if (searchTimeout !== null) {
+    window.clearTimeout(searchTimeout);
+  }
+  searchTimeout = window.setTimeout(() => {
+    handleSearch(mobileSearchQuery.value);
+  }, 300);
+};
+
+const handleMobileFilter = (status: ReferralStatus | 'all'): void => {
+  onStatusFilterChange(status);
+  showMobileFilter.value = false;
 };
 
 const onStatusFilterChange = (status: ReferralStatus | 'all'): void => {
@@ -98,11 +173,21 @@ const formatDate = (dateString: string): string => {
   });
 };
 
-// Clean up timeouts when component is unmounted
+// Sync mobile search with desktop search
+watch(searchQuery, (newVal) => {
+  mobileSearchQuery.value = newVal;
+});
+
+// Clean up when component is unmounted
 onUnmounted(() => {
-  if (searchTimeout.value) {
-    window.clearTimeout(searchTimeout.value);
+  if (searchTimeout !== null) {
+    window.clearTimeout(searchTimeout);
   }
+  
+  // Reset body styles when component is unmounted
+  document.body.style.overflow = '';
+  document.body.style.position = '';
+  document.body.style.width = '';
 });
 </script>
 
@@ -123,24 +208,56 @@ onUnmounted(() => {
            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
              <IconSearch class="h-4 w-4 text-gray-400" size="16" />
            </div>
-           <input type="text"
+           <input 
+             type="text"
              class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
-             placeholder="Search by name or email" :value="searchQuery" @input="(e: Event) => {
-               const target = e.target as HTMLInputElement;
-               searchQuery.value = target.value;
-               handleSearch(target.value);
-             }" />
+             placeholder="Search by name or email" 
+             :value="searchQuery" 
+             @input="handleSearchInput($event)" />
          </div>
        </div>
    
-       <div class="flex space-x-2 overflow-x-auto pb-2">
-         <button v-for="status in statuses" :key="status.value" @click="$emit('status-filter-change', status.value)"
-           class="px-3 py-1.5 text-sm rounded-md transition-colors" :class="{
-             'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100': statusFilter === status.value,
-             'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700': statusFilter !== status.value
-           }">
-           {{ status.name }}
-         </button>
+       <div class="relative flex items-center space-x-2 p-2 text-gray-700 dark:text-gray-200">
+         <p class="whitespace-nowrap">Status</p>
+         <div class="relative">
+           <button 
+             @click="showStatusDropdown = !showStatusDropdown" 
+             class="flex items-center justify-center h-6 w-6 rounded-full border border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+           >
+             <IconPlus class="h-3 w-3" />
+           </button>
+           
+           <!-- Dropdown -->
+           <div 
+             v-if="showStatusDropdown" 
+             ref="statusDropdownRef"
+             class="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-700"
+           >
+             <button 
+               v-for="status in statuses" 
+               :key="status.id" 
+               @click="
+                 $emit('status-filter-change', status.id);
+                 showStatusDropdown = false;
+               "
+               class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+               :class="{ 'bg-blue-50 dark:bg-blue-900': statusFilter === status.id }"
+             >
+               {{ status.name }}
+             </button>
+           </div>
+         </div>
+         
+         <!-- Selected status pill -->
+         <div class="flex items-center space-x-2 overflow-x-auto pb-1">
+           <button 
+             v-for="status in statuses.filter(s => statusFilter === s.id)" 
+             :key="status.id"
+             class="px-3 py-1.5 text-sm rounded-md bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-100 whitespace-nowrap"
+           >
+             {{ status.name }}
+           </button>
+         </div>
        </div>
      </div>
     <div v-if="!loading && !error" class="mt-6 flex flex-col">
@@ -148,7 +265,7 @@ onUnmounted(() => {
         <div class="">
           <div class="overflow-hidden shadow border border-gray-200 md:rounded-lg">
             <table class="divide-y divide-gray-300 dark:divide-gray-700 w-full">
-              <thead class="bg-gray-50 dark:bg-gray-800">
+              <thead class="">
                 <tr>
                   <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
@@ -180,7 +297,7 @@ onUnmounted(() => {
                   </th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+              <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
                 <tr v-for="referral in referrals" :key="referral.id">
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     {{ formatDate(referral.date) }}
@@ -261,15 +378,121 @@ onUnmounted(() => {
     </div>
   </div>
 
+  <!-- Mobile Search Overlay -->
+  <div v-if="showMobileSearch" class="fixed inset-0 bg-white dark:bg-gray-900 z-40 flex flex-col overflow-hidden" style="padding-bottom: 5rem;">
+    <!-- Search Header -->
+    <div class="shrink-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4">
+      <div class="flex items-center">
+        <button 
+          @click="showMobileSearch = false"
+          class="p-2 -ml-2 mr-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+        >
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <div class="relative flex-1">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <IconSearch class="h-5 w-5 text-gray-400" />
+          </div>
+          <input
+            type="text"
+            v-model="mobileSearchQuery"
+            @input="handleMobileSearch"
+            class="block w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-base"
+            placeholder="Search by name or email"
+            autofocus
+          />
+          <button 
+            v-if="mobileSearchQuery"
+            @click="mobileSearchQuery = ''; handleMobileSearch()"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
+          >
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Results -->
+    <div class="flex-1 overflow-y-auto">
+      <div v-if="loading" class="flex items-center justify-center p-4">
+        <div class="w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        <span class="ml-2 text-sm text-gray-600 dark:text-gray-300">Searching...</span>
+      </div>
+      <div v-else-if="mobileSearchQuery && referrals.length === 0" class="p-6 text-center text-gray-500 dark:text-gray-400">
+        No results found
+      </div>
+      <div v-else class="divide-y divide-gray-200 dark:divide-gray-700">
+        <div 
+          v-for="referral in referrals" 
+          :key="referral.id" 
+          class="p-4 hover:bg-gray-50 dark:hover:bg-gray-800"
+        >
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-900 dark:text-white">{{ referral.name }}</h3>
+              <p class="text-xs text-gray-500 dark:text-gray-400">{{ referral.email || 'No email' }}</p>
+              <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                {{ formatDate(referral.date) }}
+              </p>
+            </div>
+            <span class="text-sm font-medium text-gray-900 dark:text-white">
+              {{ referral.points ? `৳${referral.points}` : 'N/A' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Filter Overlay -->
+  <div v-if="showMobileFilter" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4 pt-20" @click.self="showMobileFilter = false">
+    <div class="w-full max-w-xs bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Filter by Status</h3>
+        <button @click="showMobileFilter = false" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="space-y-2">
+        <button
+          v-for="status in statuses"
+          :key="status.id"
+          @click="handleMobileFilter(status.id)"
+          class="w-full text-left px-4 py-2 text-sm rounded-md"
+          :class="{
+            'bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-100': statusFilter === status.id,
+            'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700': statusFilter !== status.id
+          }"
+        >
+          {{ status.name }}
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Mobile List -->
   <div class="md:hidden space-y-2 mt-4">
     <div class="flex justify-between">
       <h4 class="text-xl text-gray-700 dark:text-gray-200">Referral History</h4>
       <div class="flex gap-2 text-gray-700 dark:text-gray-200">
-        <button class="rounded-full p-2 border border-gray-400">
+        <button 
+          @click="showMobileSearch = true"
+          class="rounded-full p-2 border border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          :class="{ 'bg-gray-100 dark:bg-gray-700': showMobileSearch }"
+        >
           <IconSearch class="h-5 w-5" />
         </button>
-        <button class="rounded-full p-2 border border-gray-400">
+        <button 
+          @click="showMobileFilter = true"
+          class="rounded-full p-2 border border-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          :class="{ 'bg-gray-100 dark:bg-gray-700': showMobileFilter }"
+        >
           <IconListFilter class="h-5 w-5" />
         </button>
       </div>
