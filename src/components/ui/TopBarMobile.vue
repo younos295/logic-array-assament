@@ -3,7 +3,7 @@
         <div class="flex items-center justify-center gap-3">
             <div class="relative">
                 <!-- Circular Progress -->
-                <svg class="w-16 h-16" viewBox="0 0 100 100">
+                <svg class="w-12 h-12" viewBox="0 0 100 100">
                     <circle class="text-gray-700" stroke-width="10" stroke="currentColor" fill="transparent" :r="radius"
                         cx="50" cy="50" />
                     <circle class="text-blue-500 transition-all duration-100 ease-linear" stroke-width="10"
@@ -13,8 +13,8 @@
 
                 <!-- Text Info (centered inside circle) -->
                 <div class="absolute inset-0 flex flex-col items-center justify-center">
-                    <p class="text-gray-700 dark:text-gray-200 text-sm font-bold">{{ progress }}</p>
-                    <p class="text-gray-400 dark:text-gray-600 text-[10px]">Days left</p>
+                    <p class="text-gray-700 dark:text-gray-200 text-[10px] font-bold">{{ progress }}</p>
+                    <p class="text-gray-400 dark:text-gray-600 text-[7px]">Days left</p>
                 </div>
             </div>
 

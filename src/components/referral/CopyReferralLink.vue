@@ -40,7 +40,7 @@ const shareOnFacebook = () => {
 
 <template>
   <div class="bg-[url('/images/gradient.svg')] bg-cover bg-center bg-background-dark dark:bg-blue-600 rounded-lg p-4">
-    <h2 class="text-3xl font-bold text-white mb-3">Refried friend and Get ৳10 off. Get up to ৳600</h2>
+    <h2 class="text-2xl md:text-3xl font-semibold md:font-bold text-white mb-3">Refried friend and Get ৳10 off. Get up to ৳600</h2>
     <h3 class="font-medium text-white mb-2">Your referral invite link</h3>
     <div class="flex flex-col sm:flex-row gap-2 my-4">
       <div class="relative flex-1">

@@ -50,33 +50,49 @@ const pageTitle = computed(() => {
 });
 </script>
 
-<!-- Test comment: File permissions are working correctly! -->
- <!-- bg-background-light -->
 <template>
-  <div class="min-h-screen bg-background-light dark:bg-background-dark text-text-primary transition-colors duration-200 flex">
+  <div class="min-h-screen w-full bg-background-light dark:bg-background-dark text-text-primary transition-colors duration-200 flex flex-col md:flex-row">
+    <!-- Sidebar (fixed desktop) -->
+    <div class="hidden md:block fixed left-0 top-0 bottom-0 w-64 z-30 overflow-hidden">
+      <Sidebar
+        class="h-full w-full overflow-y-auto"
+        :is-mobile-menu-open="isMobileMenuOpen"
+        @toggle-mobile-menu="toggleMobileMenu"
+      />
+    </div>
+
     <!-- Mobile overlay -->
-    <div 
+    <div
       v-if="isMobileMenuOpen"
       class="fixed inset-0 bg-black/50 z-20 md:hidden"
       @click="toggleMobileMenu(false)"
     ></div>
-    
-    <!-- Sidebar -->
-    <Sidebar
-      class="sidebar hidden md:block min-h-screen fixed md:relative z-30 transform transition-transform duration-300 ease-in-out"
-      :class="{
-        'translate-x-0': isMobileMenuOpen,
-        '-translate-x-full': !isMobileMenuOpen,
-        'md:translate-x-0': true
-      }"
-      :is-mobile-menu-open="isMobileMenuOpen" 
-      @toggle-mobile-menu="toggleMobileMenu" 
-    />
-    <TopBarMobile class="md:hidden" />
-    <div class="m-0 mt-20 md:m-6 p-2 md:p-6 flex-1 rounded-2xl container mx-auto bg-card-light dark:bg-card-dark">
-      <RouterView />
+
+    <!-- Mobile Sidebar -->
+    <div 
+      v-if="isMobileMenuOpen"
+      class="fixed inset-y-0 left-0 w-64 z-30 md:hidden"
+    >
+      <Sidebar
+        class="h-full w-full overflow-y-auto"
+        :is-mobile-menu-open="isMobileMenuOpen"
+        @toggle-mobile-menu="toggleMobileMenu"
+      />
     </div>
-    <BottomNavigationMobile class="md:hidden" />
+
+    <!-- Main content area -->
+    <div class="flex-1 flex flex-col min-h-screen md:ml-64">
+      <TopBarMobile class="md:hidden flex-shrink-0" />
+
+      <!-- Scrollable section -->
+      <main class="flex-1 overflow-y-auto overflow-x-hidden p-4 md:p-6 bg-card-light dark:bg-card-dark md:rounded-tl-2xl">
+        <div class="container mx-auto my-16 md:my-0">
+          <RouterView />
+        </div>
+      </main>
+
+      <BottomNavigationMobile class="md:hidden flex-shrink-0" />
+    </div>
   </div>
 </template>
 

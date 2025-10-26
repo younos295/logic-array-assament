@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onUnmounted, watch } from 'vue';
+import { ref, onUnmounted, watch, computed } from 'vue';
 import StatusBadge from '@/components/ui/StatusBadge.vue';
 import { onClickOutside } from '@vueuse/core';
 
@@ -38,11 +38,71 @@ const emit = defineEmits<{
 
 const searchQuery = ref('');
 let searchTimeout: number | null = null;
+
+// Track selected referral IDs
+const selectedReferrals = ref<Set<string>>(new Set());
+const selectAllCheckbox = ref<HTMLInputElement | null>(null);
+
+// Watch for changes in selection to update the select-all checkbox
+watch([() => props.referrals, selectedReferrals], ([refs, selected]) => {
+  if (selectAllCheckbox.value) {
+    const allSelected = refs.length > 0 && selected.size === refs.length;
+    const someSelected = selected.size > 0 && selected.size < refs.length;
+    
+    selectAllCheckbox.value.indeterminate = someSelected;
+  }
+}, { deep: true });
+
+// Toggle selection for a single referral
+const toggleReferralSelection = (referralId: string) => {
+  if (selectedReferrals.value.has(referralId)) {
+    selectedReferrals.value.delete(referralId);
+  } else {
+    selectedReferrals.value.add(referralId);
+  }
+  // Create a new Set to trigger reactivity
+  selectedReferrals.value = new Set(selectedReferrals.value);
+};
+
+// Toggle select all referrals
+const toggleSelectAll = () => {
+  if (allSelected.value) {
+    selectedReferrals.value.clear();
+  } else {
+    selectedReferrals.value = new Set(props.referrals.map(r => r.id));
+  }
+  // Update the indeterminate state
+  if (selectAllCheckbox.value) {
+    selectAllCheckbox.value.indeterminate = false;
+  }
+};
+
+// Check if all referrals are selected
+const allSelected = computed(() => {
+  return props.referrals.length > 0 && selectedReferrals.value.size === props.referrals.length;
+});
+
+// Check if some (but not all) referrals are selected
+const someSelected = computed(() => {
+  return selectedReferrals.value.size > 0 && selectedReferrals.value.size < props.referrals.length;
+});
 const showStatusDropdown = ref(false);
 const statusDropdownRef = ref(null);
 const showMobileSearch = ref(false);
 const showMobileFilter = ref(false);
 const mobileSearchQuery = ref('');
+const expandedItems = ref<Set<string>>(new Set());
+
+// Toggle expanded state for mobile list items
+const toggleItemExpansion = (id: string) => {
+  if (expandedItems.value.has(id)) {
+    expandedItems.value.delete(id);
+  } else {
+    expandedItems.value.add(id);
+  }
+  // Create a new Set to trigger reactivity
+  expandedItems.value = new Set(expandedItems.value);
+};
 
 // Track the scroll position when opening modals
 let scrollPosition = 0;
@@ -267,6 +327,20 @@ onUnmounted(() => {
             <table class="divide-y divide-gray-300 dark:divide-gray-700 w-full">
               <thead class="">
                 <tr>
+                  <th scope="col" class="relative w-6">
+                    <input
+                      type="checkbox"
+                      ref="selectAllCheckbox"
+                      class="absolute left-4 top-1/2 -mt-2 h-4 w-4 rounded border border-gray-300
+                            appearance-none cursor-pointer
+                            bg-transparent checked:bg-blue-600 checked:border-blue-600
+                            focus:ring-2 focus:ring-blue-500
+                            before:absolute before:inset-0 before:flex before:items-center before:justify-center
+                            checked:before:content-['✔'] checked:before:text-white checked:before:text-[10px]"
+                      :checked="allSelected"
+                      @change="toggleSelectAll"
+                    />
+                  </th>
                   <th scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                     Date
@@ -298,7 +372,22 @@ onUnmounted(() => {
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-                <tr v-for="referral in referrals" :key="referral.id">
+                <tr v-for="referral in referrals" :key="referral.id" class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                  <td class="relative">
+                    <div class="absolute inset-y-0 left-4 flex items-center">
+                      <input
+                        type="checkbox"
+                        class="h-4 w-4 rounded border border-gray-300
+                              appearance-none cursor-pointer
+                              bg-transparent checked:bg-blue-600 checked:border-blue-600
+                              focus:ring-2 focus:ring-blue-500
+                              before:absolute before:inset-0 before:flex before:items-center before:justify-center
+                              checked:before:content-['✔'] checked:before:text-white checked:before:text-[10px]"
+                        :checked="selectedReferrals.has(referral.id)"
+                        @change="() => toggleReferralSelection(referral.id)"
+                      />
+                    </div>
+                  </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     {{ formatDate(referral.date) }}
                   </td>
@@ -505,22 +594,65 @@ onUnmounted(() => {
 
     <!-- Items -->
     <div v-for="referral in referrals" :key="referral.id"
-      class="flex items-center justify-between px-4 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 last:rounded-b-lg last:border-0">
-      <div class="min-w-0">
-        <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate">
-          {{ referral.name }}
-        </h3>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          {{ formatDate(referral.date) }}
-        </p>
+      class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 last:rounded-b-lg last:border-0 overflow-hidden">
+      <div class="flex items-center justify-between p-3 cursor-pointer" @click="toggleItemExpansion(referral.id)">
+        <div class="flex items-start gap-2">
+          <div 
+            class="flex items-center border border-gray-300 rounded-sm p-0.5"
+            :class="{
+              'bg-blue-500 text-white': expandedItems.has(referral.id)
+            }"
+            >
+            <IconMinus v-if="expandedItems.has(referral.id)" class="w-2.5 h-2.5" />
+            <IconPlus v-else class="w-2.5 h-2.5" />
+          </div>
+          <div class="flex flex-col items-start">
+            <h3 class="text-sm font-medium text-gray-900 dark:text-white truncate">
+              {{ referral.name }}
+            </h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+              {{ formatDate(referral.date) }}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center">
+          <span v-if="referral.points"
+            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200 mr-2">
+            ৳ {{ referral.points }}
+          </span>
+          <span v-else class="text-sm text-gray-500 dark:text-gray-400 px-2.5 mr-2">N/A</span>
+          
+        </div>
       </div>
-      <div class="ml-4">
-        <span v-if="referral.points"
-          class="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium  text-gray-800  dark:text-gray-200">
-          ৳ {{ referral.points }}
-        </span>
-        <span v-else class="text-sm text-gray-500 dark:text-gray-400 px-2.5">N/A</span>
-      </div>
+      <!-- Expanded Content with Transition -->
+      <transition
+        enter-active-class="transition-all duration-300 ease-in-out overflow-hidden"
+        enter-from-class="max-h-0 opacity-0"
+        enter-to-class="max-h-96 opacity-100"
+        leave-active-class="transition-all duration-300 ease-in-out overflow-hidden"
+        leave-from-class="max-h-96 opacity-100"
+        leave-to-class="max-h-0 opacity-0"
+        @before-enter="el => el.style.maxHeight = '0'"
+        @enter="el => el.style.maxHeight = el.scrollHeight + 'px'"
+        @before-leave="el => el.style.maxHeight = el.scrollHeight + 'px'"
+        @after-enter="el => el.style.maxHeight = 'none'"
+        @leave="el => (el.style.maxHeight = '0')"
+      >
+        <div v-show="expandedItems.has(referral.id)" class="p-2 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div>
+              <p class="text-gray-900 dark:text-white">{{ referral.phone || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-gray-900 dark:text-white truncate">{{ referral.email || 'N/A' }}</p>
+            </div>
+            <div class="flex gap-2">
+              <p class="text-gray-500 dark:text-gray-400">Status</p>
+              <StatusBadge :status="referral.status" />
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
   </div>
 
