@@ -39,8 +39,8 @@ const emit = defineEmits<{
 const searchQuery = ref('');
 let searchTimeout: number | null = null;
 
-const selectedReferrals = ref<Set<string>>(new Set());
-const selectAllCheckbox = ref<HTMLInputElement | null>(null);
+const selectedReferrals = ref(new Set<string>());
+const selectAllCheckbox = ref(null) as { value: HTMLInputElement | null };
 
 watch([() => props.referrals, selectedReferrals], ([refs, selected]) => {
   if (selectAllCheckbox.value) {
@@ -82,7 +82,7 @@ const statusDropdownRef = ref(null);
 const showMobileSearch = ref(false);
 const showMobileFilter = ref(false);
 const mobileSearchQuery = ref('');
-const expandedItems = ref<Set<string>>(new Set());
+const expandedItems = ref(new Set<string>());
 
 const toggleItemExpansion = (id: string) => {
   if (expandedItems.value.has(id)) {
@@ -514,7 +514,7 @@ onUnmounted(() => {
   </div>
 
   <!-- Mobile Filter Overlay -->
-  <div v-if="showMobileFilter" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-start justify-center p-4 pt-20" @click.self="showMobileFilter = false">
+  <div v-if="showMobileFilter" class="fixed inset-0 bg-black/50 dark:bg-white/50 z-50 flex items-start justify-center p-4 pt-20" @click.self="showMobileFilter = false">
     <div class="w-full max-w-xs bg-white dark:bg-gray-800 rounded-lg shadow-xl p-4">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">Filter by Status</h3>
