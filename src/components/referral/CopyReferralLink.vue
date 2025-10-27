@@ -107,7 +107,7 @@ const shareOnFacebook = () => {
         </div>
       </div>
       <div class="flex flex-col items-end">
-        <p class="text-white text-sm mb-1.5 text-right">Share with</p>
+        <p class="text-white text-sm mb-1.5 text-right">Scan Me</p>
         <img src="/images/QR.png" >
       </div>
     </div>

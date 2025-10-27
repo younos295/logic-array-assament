@@ -20,13 +20,13 @@
 
             <!-- Bottom Info -->
             <div class="">
-                <p class="text-gray-600 font-medium text-sm">Package 1</p>
-                <p class="text-blue-500 text-xs">Next billing on May 1, 2025</p>
+                <p class="text-gray-600 dark:text-gray-200 font-medium text-sm">Package 1</p>
+                <p class="text-blue-500 dark:text-blue-300 text-xs">Next billing on May 1, 2025</p>
             </div>
         </div>
 
         <div class="relative">
-            <IconBell />
+            <IconBell class="text-gray-600 dark:text-gray-200 size-5"/>
             <span class="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-background-light dark:border-background-dark"></span>
         </div>
     </div>

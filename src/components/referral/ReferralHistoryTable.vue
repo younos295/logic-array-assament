@@ -615,12 +615,16 @@ onUnmounted(() => {
         @leave="el => (el.style.maxHeight = '0')"
       >
         <div v-show="expandedItems.has(referral.id)" class="p-2 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 dark:border-gray-600">
-          <div class="grid grid-cols-2 gap-2 text-sm">
+          <div class="grid grid-cols-2 gap-1 text-sm">
             <div>
               <p class="text-gray-900 dark:text-white">{{ referral.phone || 'N/A' }}</p>
             </div>
             <div>
               <p class="text-gray-900 dark:text-white truncate">{{ referral.email || 'N/A' }}</p>
+            </div>
+            <div class="inline-flex gap-2">
+              <p class="text-gray-500 dark:text-gray-400">Referral Code</p>
+              <p class="text-gray-900 dark:text-white">{{ referral.referralCode || 'N/A' }}</p>
             </div>
             <div class="flex gap-2">
               <p class="text-gray-500 dark:text-gray-400">Status</p>
