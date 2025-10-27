@@ -82,7 +82,6 @@ export const navGroups: NavGroup[] = [
   }
 ];
 
-// For backward compatibility
 export const groupedNavItems = navGroups.reduce((acc, group) => {
   acc[group.group] = group.items;
   return acc;

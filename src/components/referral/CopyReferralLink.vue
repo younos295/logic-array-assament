@@ -42,13 +42,13 @@ const shareOnFacebook = () => {
   <div class="bg-[url('/images/gradient.svg')] bg-cover bg-center bg-background-dark dark:bg-blue-600 rounded-lg p-4">
     <h2 class="text-2xl md:text-3xl font-semibold md:font-bold text-white mb-3">Refried friend and Get ৳10 off. Get up to ৳600</h2>
     <h3 class="font-medium text-white mb-2">Your referral invite link</h3>
-    <div class="flex flex-col sm:flex-row gap-2 my-4">
+    <div class="flex gap-2 my-4">
       <div class="relative flex-1">
         <input
           type="text"
           :value="referralLink"
           readonly
-          class="w-full px-4 py-2 pr-12 bg-gray-50 dark:bg-transparent border border-gray-50 dark:border-gray-600 rounded-md text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
+          class="w-full px-4 py-2 pr-12 bg-gray-50 dark:bg-transparent border border-gray-50 rounded-md text-gray-900 dark:text-white focus:ring-blue-500 focus:border-blue-500"
         />
         <div class="absolute inset-y-0 right-0 flex items-center pr-3">
           <span v-if="copied" class="text-sm text-green-600 dark:text-green-400">
@@ -58,10 +58,11 @@ const shareOnFacebook = () => {
       </div>
       <button
         @click="copyToClipboard"
-        class="inline-flex gap-2 items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-800 dark:text-white bg-white focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600"
+        class="inline-flex gap-2 items-center justify-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md shadow-sm text-gray-800 bg-white focus:ring-2 focus:ring-offset-2"
       >
         <IconCopy class="h-4 w-4" />
-        <span>{{ copied ? 'Copied!' : 'Copy Link' }}</span>
+        <span class="hidden md:block">{{ copied ? 'Copied!' : 'Copy Link' }}</span>
+        <span class="block md:hidden">{{ copied ? 'Copied!' : 'Copy' }}</span>
       </button>
     </div>
     <div class="my-4 flex gap-2 justify-between">
@@ -88,7 +89,6 @@ const shareOnFacebook = () => {
   
           </button>
   
-          <!-- Email Button -->
           <button 
             @click="shareViaEmail"
             class="p-2 rounded bg-white text-gray-600 transition-colors"
@@ -97,7 +97,6 @@ const shareOnFacebook = () => {
             <IconMail class="h-5 w-5" />
           </button>
   
-          <!-- Facebook Button -->
           <button 
             @click="shareOnFacebook"
             class="p-2 rounded bg-white text-gray-600 transition-colors"
@@ -112,6 +111,6 @@ const shareOnFacebook = () => {
         <img src="/images/QR.png" >
       </div>
     </div>
-    <button class="bg-blue-600 dark:bg-white text-white text-base dark:text-gray-800 rounded-md p-2 w-full" @click="$emit('new-connection')">Request for New Connection</button>
+    <button class="bg-blue-600 dark:bg-white text-white md:text-base text-sm dark:text-gray-800 rounded-md p-2 w-full" @click="$emit('new-connection')">Request for New Connection</button>
   </div>
 </template>

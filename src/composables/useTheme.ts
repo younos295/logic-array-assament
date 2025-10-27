@@ -3,7 +3,6 @@ import { ref, watchEffect, onMounted } from 'vue'
 type Theme = 'light' | 'dark' | 'system';
 const theme = ref('light' as Theme)
 
-// Check for saved theme preference or use system preference
 const getSystemTheme = (): Theme => {
   if (typeof localStorage !== 'undefined' && localStorage.theme) {
     return localStorage.theme as Theme
@@ -24,7 +23,6 @@ export function useTheme() {
     }
   }
 
-  // Initialize theme on component mount
   onMounted(() => {
     const savedTheme = localStorage.theme
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -38,7 +36,6 @@ export function useTheme() {
     }
   })
 
-  // Watch for system theme changes when 'system' is selected
   watchEffect(() => {
     if (localStorage.theme === 'system' || !('theme' in localStorage)) {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')

@@ -5,23 +5,18 @@ import App from './App.vue';
 import router from './router';
 import lucide from './plugins/lucide';
 
-// Create the Vue app
 const app = createApp(App);
 
-// Initialize Pinia
 const pinia = createPinia();
 
 app.use(pinia);
 app.use(router);
 app.use(lucide);
 
-// Add global error handler
 app.config.errorHandler = (err: unknown, vm: unknown, info: string) => {
   console.error('Vue error:', { err, vm, info });
-  // You can add error tracking here (e.g., Sentry, LogRocket)
 };
 
-// Add global properties
 declare module '@vue/runtime-core' {
   interface ComponentCustomProperties {
     $filters: {
@@ -43,5 +38,4 @@ app.config.globalProperties.$filters = {
   },
 };
 
-// Mount the app
 app.mount('#app');

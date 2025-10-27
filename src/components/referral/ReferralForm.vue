@@ -39,18 +39,11 @@ const packages: SelectOption[] = [
 ];
 
 const updateUpazilas = (district: string): void => {
-  console.group('updateUpazilas');
-  console.log('Called with district:', district);
-  console.log('Current upazilas before update:', upazilas.value);
-  
   if (!district) {
-    console.log('No district provided, clearing upazilas');
     upazilas.value = [];
-    console.groupEnd();
     return;
   }
 
-  // Convert to lowercase for case-insensitive matching
   const districtLower = district.toLowerCase().trim();
   
   const upazilaMap: Record<string, Array<SelectOption>> = {
@@ -95,26 +88,9 @@ const updateUpazilas = (district: string): void => {
     ]
   };
   
-  // Find the matching district key (case-insensitive)
-  console.log('Available district keys:', Object.keys(upazilaMap));
-  console.log('Looking for district (case-insensitive):', districtLower);
-  
   const matchedDistrict = Object.keys(upazilaMap).find(key => key.toLowerCase() === districtLower);
-  console.log('Matched district:', matchedDistrict);
-  
   const matchedUpazilas = matchedDistrict ? upazilaMap[matchedDistrict] : [];
-  console.log('Matched upazilas:', matchedUpazilas);
   upazilas.value = matchedUpazilas;
-  
-  if (!matchedDistrict) {
-    console.warn(`No upazilas found for district: ${district}`);
-    console.warn('Available districts are:', Object.keys(upazilaMap));
-  } else {
-    console.log(`Successfully updated upazilas for district: ${matchedDistrict}`);
-  }
-  
-  console.log('Updated upazilas:', upazilas.value);
-  console.groupEnd();
 };
 
 defineProps<{
@@ -126,7 +102,6 @@ const emit = defineEmits<{
   (e: 'submit', formData: FormValues): void;
 }>();
 
-// Define form validation schema
 const schema = yup.object({
   name: yup.string().required('Name is required'),
   phone: yup.string().required('Phone number is required'),
@@ -137,7 +112,6 @@ const schema = yup.object({
   packageName: yup.string().required('Package is required'),
 });
 
-// Initialize form with useForm
 const { handleSubmit, setFieldValue, values, resetForm } = useForm<FormValues>({
   validationSchema: schema,
   initialValues: {
@@ -151,7 +125,6 @@ const { handleSubmit, setFieldValue, values, resetForm } = useForm<FormValues>({
   } as FormValues
 });
 
-// Expose reset method to parent
 const resetFormState = () => {
   resetForm();
   upazilas.value = [];
@@ -162,48 +135,26 @@ defineExpose({
   resetFormState
 });
 
-// Form submission handler
 const onSubmit = handleSubmit((values: FormValues) => {
   emit('submit', values);
 });
+const onInvalidSubmit = (): void => {};
 
-// Handle invalid form submission
-const onInvalidSubmit = ({ errors }: { errors: Record<string, string> }): void => {
-  console.log('Form validation errors:', errors);
-};
-
-// Create a ref to track the current district
 const currentDistrict = ref('');
-console.log('Initial currentDistrict ref value:', currentDistrict.value);
-
 const hasDistrict = computed(() => !!currentDistrict.value);
 
-// Watch for district changes and update upazilas accordingly
-console.log('Setting up district watcher');
-watch(() => values.district, (newVal, oldVal) => {
-  console.group('District Change');
-  console.log('Previous district value:', oldVal);
-  console.log('New district value:', newVal);
-  console.log('Current form values:', JSON.parse(JSON.stringify(values)));
-
+watch(() => values.district, (newVal) => {
   currentDistrict.value = newVal || '';
 
   if (!newVal) {
-    console.log('District cleared, resetting upazilas');
     upazilas.value = [];
     setFieldValue('upazila', '');
-    console.log('Upazilas after clear:', upazilas.value);
   } else {
     const normalized = newVal.toLowerCase().trim();
-    console.log('Calling updateUpazilas with:', normalized);
     updateUpazilas(normalized);
     setFieldValue('upazila', '');
-    console.log('Form values after upazila reset:', JSON.parse(JSON.stringify(values)));
   }
-  console.groupEnd();
 });
-
-console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)));
 </script>
 
 <template>
@@ -221,7 +172,6 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
       </div>
     </div>
 
-    <!-- Name Field -->
     <div>
       <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Full Name <span class="text-gray-500">*</span>
@@ -247,7 +197,6 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
       </ErrorMessage>
     </div>
 
-    <!-- Phone Field -->
     <div>
       <label for="phone" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Phone Number <span class="text-gray-500">*</span>
@@ -280,7 +229,6 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
       </ErrorMessage>
     </div>
 
-    <!-- Email Field -->
     <div>
       <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Email <span class="text-gray-500">*</span>
@@ -314,7 +262,6 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
       </ErrorMessage>
     </div>
 
-    <!-- District Field -->
     <div>
       <label for="district" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         District Name <span class="text-gray-500">*</span>
@@ -343,7 +290,6 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
       </ErrorMessage>
     </div>
 
-    <!-- Upazila Field -->
     <div>
       <label for="upazila" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Upazila Name <span class="text-gray-500">*</span>
@@ -373,7 +319,6 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
       </ErrorMessage>
     </div>
 
-    <!-- Address Field -->
     <div>
       <label for="address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Address <span class="text-gray-500">*</span>
@@ -399,7 +344,6 @@ console.log('Form initialized with values:', JSON.parse(JSON.stringify(values)))
       </ErrorMessage>
     </div>
 
-    <!-- Package Field -->
     <div>
       <label for="packageName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
         Package Name <span class="text-gray-500">*</span>

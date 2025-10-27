@@ -1,6 +1,5 @@
 import type { Referral, ReferralStatus } from '@/types/referral';
 
-// Mock data
 const MOCK_REFERRALS: Referral[] = [
   {
     id: '1',
@@ -22,20 +21,16 @@ const MOCK_REFERRALS: Referral[] = [
       phone: `+88017${Math.floor(1000000 + Math.random() * 9000000)}`,
       status,
       date: new Date(Date.now() - 86400000 * Math.floor(Math.random() * 30)).toISOString(),
-      discount: isSuccess ? Math.floor(Math.random() * 20) + 5 : 0, // 5-25% discount
-      points: isSuccess ? Math.floor(Math.random() * 100) + 50 : 0, // 50-150 points
+      discount: isSuccess ? Math.floor(Math.random() * 20) + 5 : 0,
+      points: isSuccess ? Math.floor(Math.random() * 100) + 50 : 0,
     };
   }),
 ];
 
-// Mock API service
 export default {
-  // Simulate network delay
   async delay(ms = 300) {
     return new Promise(resolve => setTimeout(resolve, ms + Math.random() * 500));
   },
-
-  // Get user profile
   async getMyProfile() {
     await this.delay();
     return {
@@ -46,11 +41,9 @@ export default {
     };
   },
 
-  // Get referral history
   async getMyHistory(params: { page?: number; limit?: number; status?: string; search?: string } = {}) {
     await this.delay();
     
-    // Simulate filtering and pagination
     let results = [...MOCK_REFERRALS];
     
     if (params.status && params.status !== 'all') {
@@ -65,7 +58,6 @@ export default {
       );
     }
     
-    // Simulate pagination
     const page = params.page || 1;
     const limit = params.limit || 10;
     const start = (page - 1) * limit;
@@ -79,11 +71,9 @@ export default {
     };
   },
 
-  // Add manual referral
   async postManual(data: { name: string; email: string; phone?: string }) {
     await this.delay();
     
-    // Check for duplicate email
     if (MOCK_REFERRALS.some(r => r.email === data.email)) {
       const error = new Error('Email already exists');
       (error as any).status = 409;
@@ -103,12 +93,9 @@ export default {
     return newReferral;
   },
 
-  // Backwards-compatible createReferral -> uses postManual under the hood
   async createReferral(data: { name: string; email: string; phone?: string }) {
     return this.postManual(data);
   },
-
-  // Get points balance
   async getPoints() {
     await this.delay();
     return {

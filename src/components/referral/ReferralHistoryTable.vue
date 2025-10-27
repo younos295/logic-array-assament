@@ -39,11 +39,9 @@ const emit = defineEmits<{
 const searchQuery = ref('');
 let searchTimeout: number | null = null;
 
-// Track selected referral IDs
 const selectedReferrals = ref<Set<string>>(new Set());
 const selectAllCheckbox = ref<HTMLInputElement | null>(null);
 
-// Watch for changes in selection to update the select-all checkbox
 watch([() => props.referrals, selectedReferrals], ([refs, selected]) => {
   if (selectAllCheckbox.value) {
     const allSelected = refs.length > 0 && selected.size === refs.length;
@@ -53,36 +51,29 @@ watch([() => props.referrals, selectedReferrals], ([refs, selected]) => {
   }
 }, { deep: true });
 
-// Toggle selection for a single referral
 const toggleReferralSelection = (referralId: string) => {
   if (selectedReferrals.value.has(referralId)) {
     selectedReferrals.value.delete(referralId);
   } else {
     selectedReferrals.value.add(referralId);
   }
-  // Create a new Set to trigger reactivity
   selectedReferrals.value = new Set(selectedReferrals.value);
 };
 
-// Toggle select all referrals
 const toggleSelectAll = () => {
   if (allSelected.value) {
     selectedReferrals.value.clear();
   } else {
     selectedReferrals.value = new Set(props.referrals.map(r => r.id));
   }
-  // Update the indeterminate state
   if (selectAllCheckbox.value) {
     selectAllCheckbox.value.indeterminate = false;
   }
 };
 
-// Check if all referrals are selected
 const allSelected = computed(() => {
   return props.referrals.length > 0 && selectedReferrals.value.size === props.referrals.length;
 });
-
-// Check if some (but not all) referrals are selected
 const someSelected = computed(() => {
   return selectedReferrals.value.size > 0 && selectedReferrals.value.size < props.referrals.length;
 });
@@ -93,32 +84,25 @@ const showMobileFilter = ref(false);
 const mobileSearchQuery = ref('');
 const expandedItems = ref<Set<string>>(new Set());
 
-// Toggle expanded state for mobile list items
 const toggleItemExpansion = (id: string) => {
   if (expandedItems.value.has(id)) {
     expandedItems.value.delete(id);
   } else {
     expandedItems.value.add(id);
   }
-  // Create a new Set to trigger reactivity
   expandedItems.value = new Set(expandedItems.value);
 };
 
-// Track the scroll position when opening modals
 let scrollPosition = 0;
 
-// Handle mobile filter overlay
 watch(showMobileFilter, (isOpen) => {
   if (isOpen) {
-    // Save current scroll position
     scrollPosition = window.scrollY;
-    // Add styles to prevent body scroll
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollPosition}px`;
     document.body.style.left = '0';
     document.body.style.right = '0';
   } else {
-    // Restore body styles and scroll position
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
@@ -127,18 +111,14 @@ watch(showMobileFilter, (isOpen) => {
   }
 });
 
-// Handle mobile search overlay
 watch(showMobileSearch, (isOpen) => {
   if (isOpen) {
-    // Save current scroll position
     scrollPosition = window.scrollY;
-    // Add styles to prevent body scroll
     document.body.style.position = 'fixed';
     document.body.style.top = `-${scrollPosition}px`;
     document.body.style.left = '0';
     document.body.style.right = '0';
   } else {
-    // Restore body styles and scroll position
     document.body.style.position = '';
     document.body.style.top = '';
     document.body.style.left = '';
@@ -147,7 +127,6 @@ watch(showMobileSearch, (isOpen) => {
   }
 });
 
-// Close dropdown when clicking outside
 onClickOutside(statusDropdownRef, () => {
   showStatusDropdown.value = false;
 });
@@ -233,18 +212,15 @@ const formatDate = (dateString: string): string => {
   });
 };
 
-// Sync mobile search with desktop search
 watch(searchQuery, (newVal) => {
   mobileSearchQuery.value = newVal;
 });
 
-// Clean up when component is unmounted
 onUnmounted(() => {
   if (searchTimeout !== null) {
     window.clearTimeout(searchTimeout);
   }
   
-  // Reset body styles when component is unmounted
   document.body.style.overflow = '';
   document.body.style.position = '';
   document.body.style.width = '';

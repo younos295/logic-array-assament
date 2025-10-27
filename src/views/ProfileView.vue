@@ -8,5 +8,4 @@
 </template>
 
 <script setup lang="ts">
-// Profile page logic will be added here
 </script>

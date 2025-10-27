@@ -52,7 +52,6 @@ const pageTitle = computed(() => {
 
 <template>
   <div class="min-h-screen w-full bg-background-light dark:bg-background-dark text-text-primary transition-colors duration-200 flex flex-col md:flex-row">
-    <!-- Sidebar (fixed desktop) -->
     <div class="hidden md:block fixed left-0 top-0 bottom-0 w-64 z-30 overflow-hidden">
       <Sidebar
         class="h-full w-full overflow-y-auto"

@@ -48,7 +48,7 @@ export const useReferralStore = defineStore('referral', () => {
       loading.value = true;
       error.value = null;
       const response = await api.createReferral(referralData);
-      await fetchReferrals(); // Refresh the list
+      await fetchReferrals();
       return response;
     } catch (err) {
       error.value = 'Failed to add referral';
@@ -65,16 +65,15 @@ export const useReferralStore = defineStore('referral', () => {
 
   function setStatusFilter(status: ReferralStatus | 'all') {
     statusFilter.value = status;
-    currentPage.value = 1; // Reset to first page when filter changes
+    currentPage.value = 1;
   }
 
   function setSearchQuery(query: string) {
     searchQuery.value = query;
-    currentPage.value = 1; // Reset to first page when search changes
+    currentPage.value = 1;
   }
 
   return {
-    // State
     referrals,
     loading,
     error,
@@ -83,12 +82,8 @@ export const useReferralStore = defineStore('referral', () => {
     itemsPerPage,
     searchQuery,
     statusFilter,
-    
-    // Getters
     filteredReferrals,
     paginatedReferrals,
-    
-    // Actions
     fetchReferrals,
     addReferral,
     setPage,

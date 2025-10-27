@@ -5,12 +5,8 @@ declare module '*.vue' {
   export default component;
 }
 
-// Declare the vue module with all the necessary exports
 declare module 'vue' {
-  // Vue 3 Composition API
   export * from '@vue/runtime-dom';
-  
-  // Composition API
   export const ref: any;
   export const reactive: any;
   export const computed: any;
@@ -22,7 +18,6 @@ declare module 'vue' {
   export const defineComponent: any;
   export const createApp: any;
   
-  // Other commonly used exports
   export const nextTick: any;
   export const toRef: any;
   export const toRefs: any;
@@ -31,13 +26,10 @@ declare module 'vue' {
   export const isReadonly: any;
   export const isProxy: any;
   
-  // For Options API
   export default {
     install: (app: any) => {}
   };
 }
-
-// For CSS modules
 declare module '*.module.css' {
   const classes: { readonly [key: string]: string };
   export default classes;
@@ -48,10 +40,8 @@ declare module '*.module.scss' {
   export default classes;
 }
 
-// For Vite's import.meta.env
 declare interface ImportMetaEnv {
   readonly VITE_APP_TITLE: string;
-  // more env variables...
 }
 
 declare interface ImportMeta {

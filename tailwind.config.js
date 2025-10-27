@@ -7,7 +7,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Custom light/dark colors
         brand: {
           DEFAULT: '#2469DD',
           light: '#2469DD',

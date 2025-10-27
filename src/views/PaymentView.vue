@@ -8,5 +8,4 @@
 </template>
 
 <script setup lang="ts">
-// Payment page logic will be added here
 </script>

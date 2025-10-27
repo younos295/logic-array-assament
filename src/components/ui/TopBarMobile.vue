@@ -1,5 +1,5 @@
 <template>
-    <div class="fixed p-4 top-0 left-0 right-0 h-20 flex justify-between items-center bg-card-light dark:bg-card-dark">
+    <div class="fixed p-4 top-0 left-0 right-0 z-10 h-20 flex justify-between items-center bg-card-light dark:bg-card-dark">
         <div class="flex items-center justify-center gap-3">
             <div class="relative">
                 <!-- Circular Progress -->
@@ -35,8 +35,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 
-const progress = ref(0) // start from 0%
-const target = 85 // your target progress value
+const progress = ref(0)
+const target = 85
 
 const radius = 45
 const circumference = 2 * Math.PI * radius

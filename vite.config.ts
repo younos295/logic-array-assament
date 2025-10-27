@@ -7,21 +7,17 @@ import { resolve } from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }: ConfigEnv) => {
-  // Load env file based on `mode` in the current working directory
   const env = loadEnv(mode, process.cwd(), '')
 
   return {
-    // Base public path when served in development or production
     base: env.VITE_APP_BASE || '/',
     
-    // Development server options
     server: {
       port: 5173,
-      host: true, // Listen on all network interfaces
-      open: true, // Open browser on server start
-      strictPort: true, // Exit if port is already in use
-      cors: true, // Enable CORS
-      // Proxy API requests in development
+      host: true, 
+      open: true, 
+      strictPort: true, 
+      cors: true,
       proxy: env.VITE_API_BASE_URL ? {
         [env.VITE_API_BASE_URL]: {
           target: env.VITE_API_TARGET || 'http://localhost:3001',
@@ -31,7 +27,6 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       } : undefined
     },
     
-    // Build configuration
     build: {
       target: 'esnext',
       minify: 'esbuild',
@@ -48,16 +43,13 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       chunkSizeWarningLimit: 1000 // in kB
     },
     
-    // Global CSS
     css: {
       preprocessorOptions: {
         scss: {
-          // Custom SCSS variables and mixins can be added here
         }
       }
     },
     
-    // Plugins
     plugins: [
       svgLoader(),
       vue({
@@ -69,7 +61,6 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       vueJsx(),
     ],
     
-    // Resolve configuration
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -79,13 +70,11 @@ export default defineConfig(({ mode }: ConfigEnv) => {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
     },
     
-    // Environment variables
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
       'process.env': {}
     },
     
-    // Optimize dependencies
     optimizeDeps: {
       include: [
         'vue',

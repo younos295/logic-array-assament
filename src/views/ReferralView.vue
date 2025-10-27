@@ -6,22 +6,26 @@ import CopyReferralLink from '@/components/referral/CopyReferralLink.vue';
 import ReferralHistoryTable from '@/components/referral/ReferralHistoryTable.vue';
 import ReferralForm from '@/components/referral/ReferralForm.vue';
 import GlobalDrawer from '@/components/ui/GlobalDrawer.vue';
-import RewardPoints from '@/components/RewardPoints.vue';
+import RewardPoints from '@/components/referral/RewardPoints.vue';
+import Tooltip from '@/components/ui/Tooltip.vue';
+import AppBar from '@/components/referral/AppBar.vue';
 
-// Get user ID from auth store or local storage
-const userId = 'user123'; // Replace with actual user ID from your auth system
+const userId = 'user123';
+const searchQuery = ref('');
 
 const referralStore = useReferralStore();
+
+const handleSearchInput = (value: string) => {
+  referralStore.setSearchQuery(value);
+};
 const pointsStore = usePointsStore();
 const showDrawer = ref(false);
-// Define the type for the form component's instance
 type ReferralFormInstance = {
   resetFormState: () => void;
 }
 
 const referralFormRef = ref();
 
-// Handle drawer state changes
 const handleDrawerUpdate = (isOpen: boolean) => {
   if (!isOpen && referralFormRef.value) {
     referralFormRef.value.resetFormState();
@@ -68,52 +72,39 @@ const handleFormSubmit = async (formData: any) => {
 };
 
 const handleUpgrade = () => {
-  // Handle upgrade logic here
   console.log('Upgrade button clicked');
 };
 </script>
 
 <template>
   <div class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-    <div class="col-span-1">
-      <CopyReferralLink
-        :referral-code="userId"
-        @new-connection="showDrawer = true"
-      />
+    <div class="md:col-span-2 hidden md:block">
+      <AppBar v-model="searchQuery" placeholder="Type a command or search" class="mb-4 sm:mb-0"
+        @update:modelValue="handleSearchInput" />
     </div>
     <div class="col-span-1">
-    <RewardPoints 
-      :points="points" 
-      :stats="stats"
-      @upgrade="handleUpgrade"
-    />
+      <Tooltip text="Create New Task" placement="top-end">
+        <CopyReferralLink :referral-code="userId" @new-connection="showDrawer = true" />
+      </Tooltip>
+    </div>
+    <div class="col-span-1">
+      <RewardPoints :points="points" :stats="stats" @upgrade="handleUpgrade" />
     </div>
     <div class="flex flex-col space-y-6 md:col-span-2">
       <div class="overflow-hidden">
-        <ReferralHistoryTable 
-          :referrals="referralStore.paginatedReferrals"
-          :loading="referralStore.loading"
-          :error="referralStore.error"
-          :total-items="referralStore.totalItems"
-          :current-page="referralStore.currentPage"
-          :items-per-page="referralStore.itemsPerPage"
-          :status-filter="referralStore.statusFilter"
-          @page-change="referralStore.setPage"
-          @status-filter-change="referralStore.setStatusFilter"
-          @search="referralStore.setSearchQuery"
-        />
+        <ReferralHistoryTable :referrals="referralStore.paginatedReferrals" :loading="referralStore.loading"
+          :error="referralStore.error" :total-items="referralStore.totalItems" :current-page="referralStore.currentPage"
+          :items-per-page="referralStore.itemsPerPage" :status-filter="referralStore.statusFilter"
+          @page-change="referralStore.setPage" @status-filter-change="referralStore.setStatusFilter"
+          @search="referralStore.setSearchQuery" />
       </div>
-    </div> 
+    </div>
 
     <!-- Add Referral Drawer -->
-    <GlobalDrawer v-model="showDrawer" title="New Connection Referred" size="md" @update:modelValue="handleDrawerUpdate">
-      <ReferralForm 
-        ref="referralFormRef"
-        :loading="referralStore.loading" 
-        :error="referralStore.error"
-        @submit="handleFormSubmit" 
-      />
+    <GlobalDrawer v-model="showDrawer" title="New Connection Referred" size="md"
+      @update:modelValue="handleDrawerUpdate">
+      <ReferralForm ref="referralFormRef" :loading="referralStore.loading" :error="referralStore.error"
+        @submit="handleFormSubmit" />
     </GlobalDrawer>
   </div>
 </template>
-
